@@ -1,0 +1,78 @@
+[steam]
+cmd_path = "C:\\Tools\\steamcmd"
+exe_name = "steamcmd.exe"
+app_id   = "107410"  # Arma 3
+login_user = ""      # optional
+login_pass = ""      # optional
+runscript_path = "C:\\Tools\\steamcmd\\SteamCMD.txt"
+
+[paths]
+final_mod_path = "C:\\Arma3Sync\\workshop_download\\final"
+repo_html      = "C:\\Arma3Sync\\workshop_download\\repo.html"
+mods_txt       = "C:\\Arma3Sync\\workshop_download\\mods.txt"
+log_file       = "C:\\Tools\\steamcmd\\arma3_modmanager.log"
+master_copy    = "C:\\Arma3Sync\\master"   # Zielordner für Robocopy
+
+[behavior]
+do_clean = true
+do_rename = true
+do_copy = false
+do_symlink = true
+validate = true
+dry_run = false
+
+[copy]
+mode = "all"   # "maps" | "mods" | "all"
+options = ["/MIR", "/COPYALL", "/R:5", "/W:10"]
+
+# Pfade/Ordner im Ziel, die *nicht* überschrieben werden sollen
+exclude_dirs = [
+  "steamapps",
+  ".a3s",
+  "@ter_alsalman_2_cup",
+  "@ter_anizay_cup",
+  "@ter_cham_gm",
+  "@ter_county_fermanagh_gm",
+  "@ter_hebontes",
+  "@ter_hellanmaa",
+  "@ter_kujari_cup",
+  "@ter_kunduz_river_cup",
+  "@ter_lybor",
+  "@ter_maksniemi",
+  "@ter_mull_of_kintyre_cup",
+  "@ter_north_takistan_cup",
+  "@ter_rosche_cup",
+  "@ter_sahatra_cup",
+  "@ter_scottish_highlands_cup",
+  "@ter_sumava",
+  "@ter_suursaari",
+  "@ter_umb_colombia",
+  "@ter_uzbin_valley_cup",
+  "@ter_vinjesvingen",
+  "@ter_virolahti_valtatie_7_cup"
+]
+
+# Mapping für Karten-Ordner → Zielname
+[copy.map_rename]
+"@al_salman_2.0" = "@ter_alsalman_2_cup"
+"@anizay" = "@ter_anizay_cup"
+"@cham" = "@ter_cham_gm"
+"@county_fermanagh,_northern_ireland" = "@ter_county_fermanagh_gm"
+"@hebontes_military_training_ground" = "@ter_hebontes"
+"@hellanmaa" = "@ter_hellanmaa"
+"@kujari" = "@ter_kujari_cup"
+"@kunduz_river" = "@ter_kunduz_river_cup"
+"@lybor" = "@ter_lybor"
+"@maksniemi" = "@ter_maksniemi"
+"@mull_of_kintyre" = "@ter_mull_of_kintyre_cup"
+"@north_takistan" = "@ter_north_takistan_cup"
+"@rosche,_germany" = "@ter_rosche_cup"
+"@sa'hatra" = "@ter_sahatra_cup"
+"@scottish_highlands" = "@ter_scottish_highlands_cup"
+"@sumava" = "@ter_sumava"
+"@suursaari" = "@ter_suursaari"
+"@umb_colombia" = "@ter_umb_colombia"
+"@uzbin_valley" = "@ter_uzbin_valley_cup"
+"@vinjesvingen" = "@ter_vinjesvingen"
+"@virolahti_valtatie_7" = "@ter_virolahti_valtatie_7_cup"
+"@yulakia" = "@ter_yulakia_cup"

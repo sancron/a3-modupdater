@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "modupdater"
+version = "0.1.0"
+description = "Arma 3 Mod Updater für SteamCMD (Windows Server, Python 3.13)."
+readme = "README.md"
+requires-python = ">=3.13"
+license = { text = "GPLv3" }
+
+authors = [
+    { name = "Daniel Soro", email = "dev@danielsoro.info" }
+]
+
+dependencies = [
+    "beautifulsoup4>=4.12.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "mypy",
+    "ruff",
+]
+
+[project.scripts]
+modupdater = "modupdater.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["modupdater*"]
