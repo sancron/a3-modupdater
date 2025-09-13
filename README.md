@@ -18,14 +18,14 @@ Er automatisiert:
 
 1. Projekt klonen oder entpacken:
 ```powershell
-git clone https://github.com/deinuser/modupdater.git
+git clone https://github.com/sancron/a3-modupdater.git
 cd modupdater
 ```
 
 2. Installation im Entwicklungsmodus:
 
 ```powershell
-pip install -e .
+python -m pip install -e .
 ```
 
 3. Ab jetzt ist `modupdater` als CLI-Befehl verfügbar.
@@ -35,7 +35,7 @@ pip install -e .
 ## ⚙️ Konfiguration
 
 Die Einstellungen liegen in einer TOML-Datei (`modupdater.toml`).
-Beispiel (`C:\Tools\steamcmd\modupdater.toml`):
+Beispiel (`C:\Tools\a3-modupdater\modupdater.toml`):
 
 ```toml
 [steam]
@@ -54,10 +54,12 @@ log_file       = "C:\\Tools\\steamcmd\\arma3_modmanager.log"
 master_copy    = "C:\\Arma3Sync\\master"
 
 [behavior]
-clean_aggressive = false
+do_clean = true
+do_rename = true
+do_symlink = true
+do_copy = true
 validate = true
 dry_run = false
-do_copy = true     # ⬅️ aktiviert Robocopy nach `all`
 
 [copy]
 # "maps" = nur Karten kopieren (mit Rename-Mapping)
@@ -187,5 +189,6 @@ Der Modus wird über `copy.mode` gesteuert:
 ---
 
 ## 📜 Lizenz
+
 
 GPLv3
