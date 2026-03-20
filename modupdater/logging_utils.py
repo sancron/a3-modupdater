@@ -7,6 +7,9 @@ def setup_logging(log_file: Path) -> logging.Logger:
     log_file.parent.mkdir(parents=True, exist_ok=True)
     logger = logging.getLogger("modupdater")
     logger.setLevel(logging.INFO)
+    if logger.handlers:
+        logger.handlers.clear()
+    logger.propagate = False
 
     # File Logging (rotierend)
     fh = RotatingFileHandler(log_file, maxBytes=2_000_000, backupCount=3, encoding="utf-8")

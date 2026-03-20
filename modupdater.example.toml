@@ -1,0 +1,89 @@
+# ModUpdater Beispiel-Konfiguration
+# ---------------------------------
+# Dieses File dient als Vorlage. Kopiere sie nach
+#   C:\Tools\steamcmd\modupdater.toml
+# oder nutze sie als Basis für server-spezifische Varianten.
+
+[steam]
+# Installationspfad deiner SteamCMD (Ordner, nicht EXE)
+cmd_path = "C:\Tools\steamcmd"
+
+# Name der EXE (in der Regel unverändert)
+exe_name = "steamcmd.exe"
+
+# Workshop-App-ID (107410 = Arma 3)
+app_id = "107410"
+
+# Optional: Steam-Login. Leer lassen = "anonymous".
+login_user = ""
+login_pass = ""
+
+# RunScript-Datei, die modupdater für SteamCMD schreibt.
+runscript_path = "C:\Tools\steamcmd\SteamCMD.txt"
+
+[paths]
+# Zielordner, in dem Junctions und finale Mods landen.
+final_mod_path = "C:\Arma3Sync\workshop_download\final"
+
+# Arma3Sync repo.html, welche geparst wird.
+repo_html = "C:\Arma3Sync\workshop_download\repo.html"
+
+# Ausgabe-Datei für die Mod-Liste (id,name) – wird an SteamCMD übergeben.
+mods_txt = "C:\Arma3Sync\workshop_download\mods.txt"
+
+# Log-Datei des Updaters.
+log_file = "C:\Tools\steamcmd\arma3_modmanager.log"
+
+# Master-Ordner für Robocopy (wird genutzt, wenn behavior.do_copy = true)
+master_copy = "C:\Arma3Sync\master"
+
+[behavior]
+# Entfernt alte/verwaiste @-Ordner (true/false).
+do_clean   = true
+
+# Slugifiziert vorhandene @-Ordner (true/false).
+do_rename  = true
+
+# Führt Robocopy-Schritt aus (true/false).
+do_copy    = false
+
+# Erstellt Junctions zum Workshop-Download (true/false).
+do_symlink = true
+
+# Hängt "validate" an jedes SteamCMD-Download-Kommando.
+validate   = true
+
+# Simuliert alle Schritte ohne zu schreiben/löschen.
+dry_run    = false
+
+[copy]
+# "maps" kopiert nur gemappte Karten,
+# "mods" spiegelt final_mod_path,
+# "all"  macht zuerst mods, dann maps.
+mode = "mods"
+
+# Robocopy-Argumente (Standardwerte funktionieren meist gut).
+options = ["/MIR", "/COPYALL", "/R:5", "/W:10"]
+
+# Ordner (relativ zu final_mod_path), die beim Kopieren ausgelassen werden.
+exclude_dirs = [
+  "steamapps",
+  ".a3s"
+]
+
+# Mapping Quellordner -> Zielordner (für Karten-Umbenennungen).
+[copy.map_rename]
+"@anizay" = "@ter_anizay_cup"
+"@cham" = "@ter_cham_gm"
+"@rosche,_germany" = "@ter_rosche_cup"
+
+# -----------------------------
+# Globale Defaults (optional)
+# -----------------------------
+# Wiederkehrende Listen wie exclude_dirs oder copy.map_rename kannst du
+# in eine separate Datei auslagern:
+#
+#   modupdater.global.toml
+#
+# Diese Datei liegt im gleichen Ordner wie modupdater.exe bzw. modupdater.pyz.
+# Werte aus der lokalen Config überschreiben globale Defaults.

@@ -1,0 +1,30 @@
+[copy]
+# Globale Defaults für alle Installationen
+exclude_dirs = [
+  "steamapps",
+  ".a3s"
+]
+
+[copy.map_rename]
+"@al_salman_2.0" = "@ter_alsalman_2_cup"
+"@anizay" = "@ter_anizay_cup"
+"@cham" = "@ter_cham_gm"
+"@county_fermanagh,_northern_ireland" = "@ter_county_fermanagh_gm"
+"@hebontes_military_training_ground" = "@ter_hebontes"
+"@hellanmaa" = "@ter_hellanmaa"
+"@kujari" = "@ter_kujari_cup"
+"@kunduz_river" = "@ter_kunduz_river_cup"
+"@lybor" = "@ter_lybor"
+"@maksniemi" = "@ter_maksniemi"
+"@mull_of_kintyre" = "@ter_mull_of_kintyre_cup"
+"@north_takistan" = "@ter_north_takistan_cup"
+"@rosche,_germany" = "@ter_rosche_cup"
+"@sa'hatra" = "@ter_sahatra_cup"
+"@scottish_highlands" = "@ter_scottish_highlands_cup"
+"@sumava" = "@ter_sumava"
+"@suursaari" = "@ter_suursaari"
+"@umb_colombia" = "@ter_umb_colombia"
+"@uzbin_valley" = "@ter_uzbin_valley_cup"
+"@vinjesvingen" = "@ter_vinjesvingen"
+"@virolahti_valtatie_7" = "@ter_virolahti_valtatie_7_cup"
+"@yulakia" = "@ter_yulakia_cup"

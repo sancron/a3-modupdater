@@ -23,6 +23,8 @@ dev = [
     "pytest",
     "mypy",
     "ruff",
+    "pyinstaller>=6.4",
+    "shiv>=1.0.0",
 ]
 
 [project.scripts]

@@ -1,0 +1,34 @@
+# Python / build artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.orig
+*.log
+
+# Packaging outputs
+dist/
+build/
+*.egg-info/
+*.pyz
+
+# Virtual environments
+.venv/
+.venv*/
+venv/
+.env/
+
+# Local configs / credentials
+modupdater.toml
+*.local.toml
+
+# Tools / caches
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.idea/
+.vscode/
+.DS_Store
+
+# Windows temp artifacts
+Thumbs.db
+~$*

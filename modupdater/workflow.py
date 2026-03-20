@@ -1,4 +1,5 @@
 from __future__ import annotations
+from collections.abc import Iterable, Sequence
 from .config import Config
 from .parser_html import parse_repo_html, write_mods_txt
 from .steamcmd import build_steamcmd_commands, run_steamcmd
@@ -49,7 +50,22 @@ def run_copy_step(cfg: Config, logger):
         robocopy.run_copy(cfg, logger)
 
 
-def run_workflow(cfg: Config, steps: list[str], logger):
+def _normalize_steps(steps: Sequence[str] | str | Iterable[str]) -> list[str]:
+    if isinstance(steps, str):
+        return [steps]
+    if isinstance(steps, Sequence):
+        return list(steps)
+    if isinstance(steps, Iterable):
+        return [str(step) for step in steps]
+    raise TypeError("steps must be a string or iterable of strings")
+
+
+def run_workflow(cfg: Config, steps: Sequence[str] | str, logger) -> int:
+    steps = _normalize_steps(steps)
+    if not steps:
+        logger.warning("Keine Schritte angegeben, beende Workflow.")
+        return 0
+
     steps_map = {
         "parse": lambda: run_parse(cfg, logger),
         "download": lambda: run_download(cfg, logger),
@@ -88,3 +104,4 @@ def run_workflow(cfg: Config, steps: list[str], logger):
                 fn()
         else:
             logger.warning(f"Unbekannter Schritt: {step}")
+    return 0
