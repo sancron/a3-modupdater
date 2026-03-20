@@ -1,6 +1,8 @@
 # modupdater/robocopy.py
+import shutil
 import subprocess
-from pathlib import Path
+import uuid
+from pathlib import Path, PureWindowsPath
 from collections.abc import Iterable
 from .config import Config
 from .utils import slugify
@@ -99,30 +101,148 @@ def _copy_maps(cfg: Config, dest_path: Path, log_path: Path, logger):
 def _copy_mods(cfg: Config, dest_path: Path, log_path: Path, logger):
     """
     Spiegelt den gesamten final_mod_path nach master_copy,
-    schließt dabei aber 'steamapps' + optional definierte Ordner aus.
-    WICHTIG: Wir führen diesen Schritt bei mode=all VOR _copy_maps aus.
+    respektiert dabei aber Excludes sowohl in der Quelle als auch im Ziel.
+
+    Damit Robocopy /MIR keine geschützten Zielordner löscht, werden diese
+    vorübergehend weg-verschoben und danach wieder hergestellt.
     """
     src = cfg.paths.final_mod_path
 
-    # Basis-Excludes in der QUELLE
-    exclude_src: list[Path] = [
-        src / "steamapps",
-    ]
+    protected_rel = _collect_relative_excludes(cfg)
+    source_excludes = _build_source_excludes(cfg, src, protected_rel)
 
-    # Benutzerdefinierte Excludes (wenn sie im SOURCE-Baum existieren)
+    backup_root, protected_handles = _protect_destination(dest_path, protected_rel, logger)
+    try:
+        _robocopy(cfg, src, dest_path, log_path, source_excludes, logger)
+    finally:
+        _restore_protected(backup_root, protected_handles, logger)
+
+
+def _collect_relative_excludes(cfg: Config) -> list[Path]:
+    candidates: list[Path] = []
+
+    rel = _normalize_relative("steamapps")
+    if rel:
+        candidates.append(rel)
+
     for name in (cfg.copy.exclude_dirs or []):
-        # Excludes können relative Namen sein — wir interpretieren sie als
-        # Ordner unterhalb von "src". Existieren sie nicht, stört es nicht.
-        exclude_src.append(src / name)
+        rel = _normalize_relative(name)
+        if rel:
+            candidates.append(rel)
 
-    # Optional: Map-Quellen von der Mods-Spiegelung ausschließen,
-    # damit während /MIR keine Map-Ordner im Ziel beeinflusst werden.
-    # (Ist bei Reihenfolge "mods dann maps" nicht zwingend, aber sicher.)
+    for dst_name in (cfg.copy.map_rename or {}).values():
+        rel = _normalize_relative(dst_name)
+        if rel:
+            candidates.append(rel)
+
+    return _dedupe_relatives(candidates)
+
+
+def _build_source_excludes(cfg: Config, src_root: Path, rel_excludes: list[Path]) -> list[Path]:
+    paths: list[Path] = []
+    for rel in rel_excludes:
+        paths.append(src_root / rel)
+
     for raw_src_name in (cfg.copy.map_rename or {}).keys():
         map_src_folder = f"@{slugify(raw_src_name.lstrip('@'))}"
-        exclude_src.append(src / map_src_folder)
+        paths.append(src_root / map_src_folder)
 
-    _robocopy(cfg, src, dest_path, log_path, _unique_paths(exclude_src), logger)
+    return _unique_paths(paths)
+
+
+def _normalize_relative(value) -> Path | None:
+    if value is None:
+        return None
+    raw = str(value).strip().replace("/", "\\")
+    if not raw:
+        return None
+
+    candidate = PureWindowsPath(raw)
+    parts = list(candidate.parts)
+    if candidate.is_absolute() and parts:
+        parts = parts[1:]
+    parts = [part for part in parts if part not in ("", ".")]
+    if not parts:
+        return None
+    rel = Path(parts[0])
+    for part in parts[1:]:
+        rel /= part
+    return rel
+
+
+def _dedupe_relatives(rel_paths: Iterable[Path]) -> list[Path]:
+    cleaned: list[Path] = []
+    for path in rel_paths:
+        if not path:
+            continue
+        normalized = Path(*[p for p in path.parts if p not in ("", ".")])
+        if not normalized.parts:
+            continue
+        cleaned.append(normalized)
+
+    cleaned.sort(key=lambda p: (len(p.parts), tuple(part.lower() for part in p.parts)))
+    deduped: list[Path] = []
+    seen: list[tuple[str, ...]] = []
+    for rel in cleaned:
+        key = tuple(part.lower() for part in rel.parts)
+        if any(key[: len(existing)] == existing for existing in seen):
+            continue
+        deduped.append(rel)
+        seen.append(key)
+    return deduped
+
+
+def _protect_destination(dest_root: Path, rel_paths: list[Path], logger):
+    renames: list[tuple[Path, Path]] = []
+    backup_root: Path | None = None
+    for rel in sorted(rel_paths, key=lambda p: len(p.parts), reverse=True):
+        target = dest_root / rel
+        if not target.exists() or not target.is_dir():
+            continue
+
+        if backup_root is None:
+            backup_root = _create_backup_root(dest_root)
+        backup_target = backup_root / rel
+        backup_target.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            logger.info(f"Schütze Ordner vor Robocopy: {target}")
+            target.rename(backup_target)
+            renames.append((backup_target, target))
+        except OSError as exc:
+            logger.error(f"Konnte {target} nicht sichern: {exc}")
+    return backup_root, renames
+
+
+def _create_backup_root(dest_root: Path) -> Path:
+    parent = dest_root.parent if dest_root.parent != dest_root else dest_root
+    base = parent / ".modupdater_protected"
+    base.mkdir(parents=True, exist_ok=True)
+    run_root = base / f"run_{uuid.uuid4().hex}"
+    run_root.mkdir(parents=True, exist_ok=True)
+    return run_root
+
+
+def _restore_protected(backup_root: Path | None, renames: list[tuple[Path, Path]], logger):
+    if backup_root is None:
+        return
+    for backup, target in reversed(renames):
+        try:
+            if target.exists():
+                if target.is_dir():
+                    shutil.rmtree(target)
+                else:
+                    target.unlink()
+            target.parent.mkdir(parents=True, exist_ok=True)
+            backup.rename(target)
+            logger.info(f"Wiederhergestellt: {target}")
+        except OSError as exc:
+            logger.error(f"Konnte {target} nicht wiederherstellen: {exc}")
+    shutil.rmtree(backup_root, ignore_errors=True)
+    base = backup_root.parent
+    try:
+        base.rmdir()
+    except OSError:
+        pass
 
 
 def _unique_paths(paths: Iterable[Path]) -> list[Path]:

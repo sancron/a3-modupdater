@@ -19,6 +19,7 @@ venv/
 
 # Local configs / credentials
 modupdater.toml
+modupdater.global.toml
 *.local.toml
 
 # Tools / caches

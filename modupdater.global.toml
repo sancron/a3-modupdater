@@ -2,7 +2,28 @@
 # Globale Defaults für alle Installationen
 exclude_dirs = [
   "steamapps",
-  ".a3s"
+  ".a3s",
+  "@ter_alsalman_2_cup",
+  "@ter_anizay_cup",
+  "@ter_cham_gm",
+  "@ter_county_fermanagh_gm",
+  "@ter_hebontes",
+  "@ter_hellanmaa",
+  "@ter_kujari_cup",
+  "@ter_kunduz_river_cup",
+  "@ter_lybor",
+  "@ter_maksniemi",
+  "@ter_mull_of_kintyre_cup",
+  "@ter_north_takistan_cup",
+  "@ter_rosche_cup",
+  "@ter_sahatra_cup",
+  "@ter_scottish_highlands_cup",
+  "@ter_sumava",
+  "@ter_suursaari",
+  "@ter_umb_colombia",
+  "@ter_uzbin_valley_cup",
+  "@ter_vinjesvingen",
+  "@ter_virolahti_valtatie_7_cup"
 ]
 
 [copy.map_rename]
